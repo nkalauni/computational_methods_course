@@ -1,0 +1,288 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Packages
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{caption}
+
+% Code listing style
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    breaklines=true,
+    captionpos=b,
+    tabsize=4,
+    showstringspaces=false
+}
+
+% Title
+\title{\textbf{HWRS640 -- Assignment 1:\\Computer Architecture and Parallel Computing}}
+\author{Nabin Kalauni}
+\date{February 6, 2026}
+
+\begin{document}
+\maketitle
+
+% ===========================================================================
+\section{Problem 1: Supercomputer Architecture (25 pts)}
+% ===========================================================================
+
+\subsection{Name and Location}
+The Frontier supercomputer (also designated OLCF-5) is located at the Oak Ridge Leadership Computing Facility (OLCF) at Oak Ridge National Laboratory (ORNL) in Oak Ridge, Tennessee, USA. It is operated by the U.S.\ Department of Energy's Office of Science and managed by UT-Battelle. As of the November 2025 TOP500 list, Frontier is ranked \textbf{\#2} in the world, behind El Capitan at Lawrence Livermore National Laboratory.
+
+\subsection{Architecture}
+Frontier is built on the \textbf{HPE Cray EX235a} platform. Table~\ref{tab:frontier} summarizes its key specifications.
+
+\begin{table}[H]
+\centering
+\caption{Frontier supercomputer specifications.}
+\label{tab:frontier}
+\begin{tabular}{ll}
+\toprule
+\textbf{Component} & \textbf{Details} \\
+\midrule
+Manufacturer        & Hewlett Packard Enterprise (HPE) \\
+CPU                 & AMD Optimized 3rd Gen EPYC 7713 ``Trento'' 64-core, 2\,GHz \\
+                    & (9{,}472 CPUs $\times$ 64 cores = 606{,}208 CPU cores) \\
+GPU / Accelerator   & AMD Instinct MI250X \\
+                    & (37{,}888 GPUs $\times$ 220 CUs = 8{,}335{,}360 GPU stream processors) \\
+Total Cores         & 9{,}066{,}176 (combined CPU + GPU) \\
+Interconnect        & HPE Slingshot-11 \\
+Operating System    & HPE Cray OS \\
+Installation Year   & 2021 (open for users in 2022) \\
+Power Consumption   & 24{,}607\,kW \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each Frontier node consists of one AMD EPYC CPU and four AMD MI250X GPUs, connected via Infinity Fabric. The Slingshot-11 interconnect provides high-bandwidth, low-latency communication across the full system using a dragonfly topology.
+
+\subsection{Peak Performance}
+\begin{itemize}
+    \item \textbf{LINPACK (Rmax):} 1{,}353 PFlop/s (1.353 EFlop/s). This is the performance achieved on the LINPACK benchmark, which measures the system's ability to solve dense linear equations.
+    \item \textbf{Theoretical Peak (Rpeak):} 2{,}055.72 PFlop/s. This is the maximum theoretical performance based on the hardware specifications (number of cores, clock speed, and FLOPs per cycle).
+    \item \textbf{HPCG:} 14{,}054 TFlop/s (\#3 on the HPCG ranking). HPCG (High Performance Conjugate Gradients) is a benchmark that measures performance on a more realistic workload involving sparse linear algebra, which is more representative of many scientific applications.
+\end{itemize}
+
+\subsection{Applications and Research}
+Frontier supports a broad portfolio of scientific and engineering applications through the OLCF's Frontier Center for Accelerated Application Readiness (CAAR) program. Key research areas include:
+\begin{itemize}
+    \item \textbf{Astrophysics:} Galaxy-scale simulations using the Cholla code, modeling Milky Way-like systems with detailed hydrodynamics.
+    \item \textbf{Genomics and Biology:} Large-scale genome-wide epistasis studies (GWES) using CoMet for applications in bioenergy, clinical genomics, and disease research (e.g., Alzheimer's, opioid addiction).
+    \item \textbf{Fluid Dynamics:} Direct numerical simulation of turbulence at unprecedented resolution ($\sim$35 trillion grid points) using the GESTS code.
+    \item \textbf{Molecular Dynamics:} Virus entry mechanism studies (e.g., Zika virus) using NAMD, enabling large-scale biomolecular simulations.
+    \item \textbf{Nuclear Physics:} Coupled-cluster calculations for nuclear structure and reactions using NuCCOR.
+    \item \textbf{Materials Science and Condensed Matter:} First-principles alloy and magnetic system simulations using LSMS.
+    \item \textbf{Plasma Physics:} Particle-in-cell simulations for advanced plasma accelerators using PIConGPU.
+    \item \textbf{Nuclear Energy:} Modeling the entire lifespan of nuclear reactors, and integration of AI with traditional HPC modeling and simulation.
+\end{itemize}
+
+
+\clearpage
+% ===========================================================================
+\section{Problem 2: Moore's Law and Linear Regression (25 pts)}
+% ===========================================================================
+
+\subsection{Data Loading}
+The dataset was loaded from \texttt{moores.csv}. The dataset contained \textbf{508 data points} spanning \textbf{1953--2023}.
+
+\subsection{Linear Regression Model}
+Since Moore's Law predicts exponential growth, we model $\log_2(\text{transistor count})$ as a linear function of year:
+\begin{equation}
+    \log_2(N) = m \cdot \text{year} + b
+\end{equation}
+Applying ordinary least-squares linear regression via \texttt{scipy.stats.linregress}:
+\begin{align}
+    m &= 0.4472 \text{ (doublings per year)} \\
+    b &= -868.94 \\
+    R^2 &= 0.854
+\end{align}
+
+\subsection{Visualization}
+Figure~\ref{fig:moores} shows the original data (semi-log scale) with the fitted regression line.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{problem2_moores_law.png}
+    \caption{Transistor count versus year with exponential fit. The regression line corresponds to a doubling time of 2.24 years.}
+    \label{fig:moores}
+\end{figure}
+
+\subsection{Doubling Time}
+The doubling time is the reciprocal of the slope:
+\begin{equation}
+    T_{\text{double}} = \frac{1}{m} = \frac{1}{0.4472} \approx \textbf{2.24 \text{ years}}
+\end{equation}
+This is close to but slightly longer than the commonly cited value of \textbf{2 years}.
+
+\subsection{Early vs.\ Late Era Comparison (for fun)}
+We repeated the regression for the first 10 years (1953--1963, $n=19$) and last 10 years (2013--2023, $n=143$) of the dataset.
+
+\begin{table}[H]
+\centering
+\caption{Regression results for early and late eras.}
+\label{tab:eras}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Era} & \textbf{Slope} & \textbf{Doubling Time (yr)} & $\mathbf{R^2}$ \\
+\midrule
+Full dataset (1953--2023)  & 0.4472 & 2.24 & 0.854 \\
+First 10 years (1953--1963) & 0.2499 & 4.00 & 0.038 \\
+Last 10 years (2013--2023)  & 0.6957 & 1.44 & 0.202 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{problem2_early_vs_late.png}
+    \caption{Comparison of transistor growth in the early and late eras.}
+    \label{fig:eras}
+\end{figure}
+
+The early era (1953--1963) shows a much slower doubling time of $\sim$4 years with very low $R^2$, since it was early days of computing hardware. The late era (2013--2023) shows a faster apparent doubling time of $\sim$1.44 years. The overall trend suggests that Moore's Law has, if anything, \emph{accelerated} in terms of raw transistor counts.
+
+\clearpage
+% ===========================================================================
+\section{Problem 3: Row vs.\ Column Order Data Access (25 pts)}
+% ===========================================================================
+
+\subsection{Array Creation}
+A $10{,}000 \times 10{,}000$ NumPy array was created, filled with random numbers drawn from a standard normal distribution (\texttt{np.random.standard\_normal}).
+
+% NOTE: Replace the placeholder values below with your actual 10,000x10,000 results.
+\subsection{Row-Major and Column-Major Summation}
+Two Python functions were implemented using explicit nested \texttt{for} loops:
+\begin{itemize}
+    \item \textbf{Row-major:} outer loop over rows, inner loop over columns (accesses \texttt{arr[i,j]}).
+    \item \textbf{Column-major:} outer loop over columns, inner loop over rows (accesses \texttt{arr[i,j]} with swapped loop order).
+\end{itemize}
+
+\subsection{Performance Measurements}
+Each method was timed over 30 repetitions using \texttt{time.perf\_counter()}.
+
+\begin{table}[H]
+\centering
+\caption{Execution times for array summation (10{,}000$\times$10{,}000).}
+\label{tab:p3}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{Mean Time (s)} & \textbf{Std Dev (s)} \\
+\midrule
+Row-major (Python loop)    & \texttt{7.2538} & \texttt{0.2287} \\
+Column-major (Python loop) & \texttt{7.4301} & \texttt{0.2888} \\
+NumPy \texttt{np.sum()}    & \texttt{0.0148} & \texttt{0.0053} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{problem3_performance.png}
+    \caption{Comparison of summation methods.}
+    \label{fig:p3}
+\end{figure}
+
+\subsection{Discussion}
+The performance differences arise from two main factors:
+
+\textbf{Cache locality and memory access patterns.}
+NumPy arrays use row-major (C-order) memory layout by default. In row-major order, elements within the same row are stored contiguously in memory. When the row-major function iterates over columns in the inner loop, it accesses consecutive memory addresses, exploiting \emph{spatial locality}: each cache line fetched from RAM contains multiple useful elements. Conversely, the column-major function accesses elements separated by $N$ elements (an entire row) in memory, causing frequent \emph{cache misses} as the CPU must fetch new cache lines for each element. This results in the column-major approach being slower than the row-major approach.
+
+\textbf{Python interpreter overhead.}
+Both loop-based methods are dramatically slower than \texttt{np.sum()} because Python's interpreter incurs significant per-iteration overhead (type checking, reference counting, etc.) for each of the $10^8$ iterations. NumPy's \texttt{np.sum()} delegates the summation to optimized C code that operates on contiguous memory blocks with vectorized SIMD instructions, eliminating Python overhead entirely.
+
+\clearpage
+% ===========================================================================
+\section{Problem 4: Scaling and Parallel Computing (25 pts)}
+% ===========================================================================
+
+\subsection{Z-Score Function}
+A function was implemented that generates a Dask array of shape $(n, n)$ filled with random normal values and computes the element-wise z-score:
+\begin{equation}
+    z = \frac{x - \mu}{\sigma}
+\end{equation}
+where $\mu = \texttt{x.mean()}$ and $\sigma = \texttt{x.std()}$ are computed lazily via Dask and materialized with \texttt{.compute()}. The number of Dask workers is configured via \texttt{dask.config.set(num\_workers=n)}.
+
+\subsection{Strong Scaling}
+The array size was fixed at $20{,}000 \times 20{,}000$ and execution was timed using 1, 2, 3, and 4 cores.
+
+% NOTE: Replace with your actual results.
+\begin{table}[H]
+\centering
+\caption{Strong scaling results (20{,}000$\times$20{,}000 array).}
+\label{tab:strong}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Cores $p$} & \textbf{Time $T(p)$ (s)} & \textbf{Speedup $S(p)$} & \textbf{Efficiency $E(p)$} \\
+\midrule
+1 & \texttt{4.55} & 1.00 & 1.00 \\
+2 & \texttt{2.70} & \texttt{1.69} & \texttt{0.84} \\
+3 & \texttt{2.51} & \texttt{1.81} & \texttt{0.60} \\
+4 & \texttt{2.46} & \texttt{1.85} & \texttt{0.46} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{problem4_strong_scaling.png}
+    \caption{Strong scaling: execution time and speedup vs.\ number of cores.}
+    \label{fig:strong}
+\end{figure}
+
+\subsection{Weak Scaling}
+For weak scaling, the work per core was held constant by scaling the array size proportionally with the number of cores. With a base size of $20{,}000 \times 20{,}000$ per core, the total array size for $p$ cores is $(20{,}000\sqrt{p}) \times (20{,}000\sqrt{p})$.
+
+\begin{table}[H]
+\centering
+\caption{Weak scaling results.}
+\label{tab:weak}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Cores $p$} & \textbf{Array Size} & \textbf{Time (s)} \\
+\midrule
+1 & $20{,}000 \times 20{,}000$ & \texttt{4.34} \\
+2 & $28{,}284 \times 28{,}284$ & \texttt{11.81} \\
+3 & $34{,}641 \times 34{,}641$ & \texttt{30.07} \\
+4 & $40{,}000 \times 40{,}000$ & \texttt{64.55} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{problem4_weak_scaling.png}
+    \caption{Weak scaling: execution time vs.\ number of cores.}
+    \label{fig:weak}
+\end{figure}
+
+\subsection{Discussion}
+Several factors typically limit scalability in this setting:
+
+\begin{enumerate}
+    \item \textbf{Amdahl's Law:} The z-score computation requires global reductions (mean and standard deviation) that introduce serial bottlenecks. These aggregation steps require inter-worker communication and cannot be perfectly parallelized.
+
+    \item \textbf{Task scheduling overhead:} Dask's task graph scheduler introduces overhead for creating, scheduling, and coordinating tasks across workers.
+
+    \item \textbf{Memory bandwidth:} The z-score computation is memory-bound (reading and writing large arrays with simple arithmetic). On shared-memory systems, cores compete for memory bandwidth, which limits the achievable speedup.
+
+    \item \textbf{Weak scaling and superlinear growth:} In the weak scaling experiment, the total array size grows with $p$ (from $20{,}000 \times 20{,}000$ to $40{,}000 \times 40{,}000$). The $\sim$15$\times$ increase in execution time for a $4\times$ increase in total work indicates that overhead grows superlinearly. This is likely because larger arrays exceed cache capacity, and the increased number of Dask task graph nodes (more chunks) compounds scheduling and communication costs.
+
+\end{enumerate}
+
+In practice, speedup on 4 cores for this problem is only about $1.85\times$ rather than the ideal $4\times$, reflecting the combined effects of the factors above.
+
+\end{document}
