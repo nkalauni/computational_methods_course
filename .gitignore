@@ -44,3 +44,12 @@ Thumbs.db
 
 # Environment
 .env
+
+# Latex build
+*.aux
+*.log
+*.out
+*.toc
+*.fdb_latexmk
+*.fls
+*.synctex.gz
